@@ -27,23 +27,23 @@ export async function getUser(req, res) {
   const { user } = res.locals;
 
   try {
-    const visitResult = await db.query(`SELECT SUM(shortens."visitCount") FROM shortens WHERE "userId" = $1`, [user.id]);
+    const visitResult = await db.query(`SELECT SUM(shortlinks."visitCounter") FROM shortlinks WHERE "userId" = $1`, [user.id]);
 
-    const [visitCount] = visitResult.rows;
+    const [visitCounter] = visitResult.rows;
 
-    const urlResults = await db.query(`SELECT * FROM shortens WHERE "userId" = $1`, [user.id]);
+    const urlResults = await db.query(`SELECT * FROM shortlinks WHERE "userId" = $1`, [user.id]);
 
     const shortenedUrls = urlResults.rows.map((row) => ({
       id: row.id,
       shortUrl: row.shortUrl,
       url: row.url,
-      visitCount: row.visitCount
+      visitCounter: row.visitCounter
     }));
 
     res.send({
       id: user.id,
       name: user.name,
-      visitCount: visitCount.sum || 0,
+      visitCounter: visitCounter.sum || 0,
       shortenedUrls
     });
 
@@ -58,18 +58,17 @@ export async function getRanking(req, res) {
     const { rows } = await db.query(`
       SELECT u.id, u.name, 
         COUNT(s.id) as "linksCount",
-        COALESCE(SUM(s."visitCount"), 0) as "visitCount"
+        COALESCE(SUM(s."visitCounter"), 0) as "visitCounter"
       FROM users u
-      LEFT JOIN shortens s ON s."userId" = u.id
+      LEFT JOIN shortlinks s ON s."userId" = u.id
       GROUP BY u.id
-      ORDER BY "visitCount" DESC
+      ORDER BY "visitCounter" DESC
       LIMIT 10
     `);
 
     res.send(rows);
-
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error.message);
+    console.error(error);
+    res.status(500).send("Error");
   }
 }

@@ -12,7 +12,7 @@ export async function signIn(req, res) {
     );
 
     if (users.length === 0) {
-      return res.sendStatus(401);
+      return res.status(401).send({ error: "Email ou senha incorretas" });
     }
 
     const user = users[0];
@@ -27,9 +27,11 @@ export async function signIn(req, res) {
       return res.send({ token });
     }
 
-    return res.sendStatus(401);
+    return res.status(401).send({ error: "Email ou senha incorretas" });
+
   } catch (error) {
-    console.error('Houve um erro no sign-in:', error);
-    return res.sendStatus(500);
+    console.error("Ocorreu um erro durante no sign-in:", error);
+    return res.status(500).send({ error: "Erro" });
   }
 }
+
