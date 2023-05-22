@@ -27,6 +27,7 @@ export async function shortUrl(req, res) {
   }
 }
 
+
 export async function getUrlId(req, res) {
   const { id } = req.params;
 
