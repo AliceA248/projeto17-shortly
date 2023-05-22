@@ -1,14 +1,13 @@
 import { nanoid } from "nanoid";
 import { db } from '../database/db.js';
 
-const SHORT_ID_LENGTH = 8;
 
 export async function shortUrl(req, res) {
   const { url } = req.body;
   const { id: userId } = res.locals.user;
 
   try {
-    const shortUrl = nanoid(SHORT_ID_LENGTH);
+    const shortUrl = nanoid();
 
     const { rows } = await db.query(
       `INSERT INTO shortlinks (url, "shortUrl", "userId") VALUES ($1, $2, $3) RETURNING id`,
@@ -26,6 +25,7 @@ export async function shortUrl(req, res) {
     res.status(500).send("Erro");
   }
 }
+
 
 
 export async function getUrlId(req, res) {
