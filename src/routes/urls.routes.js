@@ -9,8 +9,9 @@ const router = Router();
 router.post("/urls/shorten",validateSchema(urlSchema),authValidation,shortUrl);
 router.get("/urls/:id", getUrlId);
 router.get("/urls/open/:shortUrl", openShortUrl);
-router.delete("/urls/:id", authValidation, deleteUrl);
 router.get("/users/me", authValidation, getUserData);
+router.delete("/urls/:id", authValidation, deleteUrl);
+
 
 
 export default router;

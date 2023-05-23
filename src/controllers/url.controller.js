@@ -4,16 +4,14 @@ import { db } from '../database/db.js';
 const SHORT_ID_LENGTH = 8;
 
 export async function shortUrl(req, res) {
+
   const { url } = req.body;
   const { id: userId } = res.locals.user;
 
   try {
     const shortUrl = nanoid(SHORT_ID_LENGTH);
 
-    const { rows } = await db.query(
-      `INSERT INTO shortlinks (url, "shortUrl", "userId") VALUES ($1, $2, $3) RETURNING id`,
-      [url, shortUrl, userId]
-    );
+    const { rows } = await db.query(`INSERT INTO shortlinks (url, "shortUrl", "userId") VALUES ($1, $2, $3) RETURNING id`, [url, shortUrl, userId]);
 
     const [result] = rows;
 
@@ -21,6 +19,8 @@ export async function shortUrl(req, res) {
       id: result.id,
       shortUrl,
     });
+
+
   } catch (error) {
     console.log(error);
     res.status(500).send("Erro");
@@ -66,6 +66,7 @@ export async function openShortUrl(req, res) {
     await db.query(`UPDATE shortlinks SET "visitCounter" = "visitCounter" + 1 WHERE id = $1`, [url.id]);
 
     res.redirect(url.url);
+
   } catch (error) {
     console.log(error);
     res.status(500).send("Erro.");
@@ -92,6 +93,7 @@ export async function deleteUrl(req, res) {
     await db.query(`DELETE FROM shortlinks WHERE id = $1`, [id]);
 
     res.sendStatus(204);
+
   } catch (error) {
     console.log(error);
     res.status(500).send("");
@@ -111,6 +113,7 @@ export async function getUserData(req, res) {
       const [userData] = userRows;
   
       const { rows: urlRows } = await db.query(
+        
         `SELECT shortlinks.id, shortlinks."shortUrl", shortlinks.url, SUM(shortlinks."visitCounter") AS visitCount
         FROM shortlinks
         WHERE shortlinks."userId" = $1
